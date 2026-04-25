@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Demo Supabase + GitHub Pages</title>
+</head>
+<body>
+  <h2>Registro nombres (Supabase + GitHub Pages)</h2>
+  <form id="formulario">
+    <input type="text" id="nombre" placeholder="Ingresa tu nombre" required>
+    <button type="submit">Guardar</button>
+  </form>
+  <h3>Nombres guardados:</h3>
+  <ul id="lista-nombres"></ul>
+
+  <!-- JS aquí debajo -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    // Reemplaza estos datos por los tuyos:
+    const SUPABASE_URL = 'https://qafhbbrkpqkgcqxntdma.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhZmhiYnJrcHFrZ2NxeG50ZG1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDUxNjQsImV4cCI6MjA5MjcyMTE2NH0.VHmgTAVs9_k_eTLqSmJpadSEgew-KJBwcGTWxdE1egI';
+
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function cargarNombres() {
+      const { data, error } = await supabase
+        .from('nombres')
+        .select('*');
+      const lista = document.getElementById('lista-nombres');
+      lista.innerHTML = '';
+      if (data) {
+        data.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = item.nombre;
+          lista.appendChild(li);
+        });
+      }
+    }
+
+    document.getElementById('formulario').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value;
+      if (!nombre) return;
+      const { data, error } = await supabase
+        .from('nombres')
+        .insert([{ nombre }]);
+      document.getElementById('nombre').value = '';
+      cargarNombres();
+    });
+
+    // Inicializando lista al cargar
+    cargarNombres();
+  </script>
+</body>
+</html>
